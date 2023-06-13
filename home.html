@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>e-Lib</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background-image: url(lib02.jpg);
+      background-size: cover;
+      padding: 10px;
+    }
+
+    .box {
+      background-color: white;
+      opacity: 0.85;
+      width: auto;
+      margin-left: 5%;
+      margin-right: 5%;
+      border-radius: 10px;
+    }
+
+    .book-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .book-item {
+      margin-bottom: 10px;
+    }
+
+    .cart-button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="container mt-5">
+      <h1 class="mb-4" style="padding: 15px; text-align: center;"><b>LIBRARY CATALOG</b></h1>
+
+      <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+          <form class="form-inline">
+            <div class="input-group w-100">
+              <input type="text" class="form-control" id="search-input" placeholder="Search...">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="search-button">Search</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary float-right cart-button" onclick="goToCart()">Go to Cart</button>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div id="book-count"></div>
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-secondary float-right"  id="filter-button">Filter by Genre</button>
+        </div>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Year of Publishing</th>
+            <th>Availability</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="book-table-body">
+        
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+ 
+    const books = [
+    
+  {
+    "title": "Alice in Wonderland",
+    "author": "Lewis Carroll",
+    "genre": "Fantasy",
+    "publishingYear": "1865",
+    "availability": 382
+  },
+  {
+    "title": "Brave New World",
+    "author": "Aldous Huxley",
+    "genre": "Sci-Fi",
+    "publishingYear": "1932",
+    "availability": 270
+  },
+  {
+    "title": "Catch-22",
+    "author": "Joseph Heller",
+    "genre": "Comedy",
+    "publishingYear": "1961",
+    "availability": 186
+  },
+  {
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "genre": "Sci-Fi",
+    "publishingYear": "1965",
+    "availability": 408
+  },
+  {
+    "title": "Emma",
+    "author": "Jane Austen",
+    "genre": "Romance",
+    "publishingYear": "1815",
+    "availability": 156
+  },
+  {
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "genre": "Horror",
+    "publishingYear": "1818",
+    "availability": 320
+  },
+  {
+    "title": "Great Expectations",
+    "author": "Charles Dickens",
+    "genre": "Drama",
+    "publishingYear": "1861",
+    "availability": 482
+  },
+  {
+    "title": "Heart of Darkness",
+    "author": "Joseph Conrad",
+    "genre": "Drama",
+    "publishingYear": "1899",
+    "availability": 115
+  },
+  {
+    "title": "Iliad",
+    "author": "Homer",
+    "genre": "Epic",
+    "publishingYear": "8th Century BC",
+    "availability": 91
+  },
+  {
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "genre": "Romance",
+    "publishingYear": "1847",
+    "availability": 228
+  },
+  {
+    "title": "Kafka on the Shore",
+    "author": "Haruki Murakami",
+    "genre": "Mystery",
+    "publishingYear": "2002",
+    "availability": 114
+  },
+  {
+    "title": "Les Misérables",
+    "author": "Victor Hugo",
+    "genre": "Drama",
+    "publishingYear": "1862",
+    "availability": 671
+  },
+  {
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "genre": "Adventure",
+    "publishingYear": "1851",
+    "availability": 238
+  },
+  {
+    "title": "Nineteen Eighty-Four",
+    "author": "George Orwell",
+    "genre": "Sci-Fi",
+    "publishingYear": "1949",
+    "availability": 420
+  },
+  {
+    "title": "Oliver Twist",
+    "author": "Charles Dickens",
+    "genre": "Drama",
+    "publishingYear": "1838",
+    "availability": 195
+  },
+  {
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "genre": "Romance",
+    "publishingYear": "1813",
+    "availability": 523
+  },
+  {
+    "title": "Q & A",
+    "author": "Vikas Swarup",
+    "genre": "Drama",
+    "publishingYear": "2005",
+    "availability": 96
+  },
+  {
+    "title": "Romeo and Juliet",
+    "author": "William Shakespeare",
+    "genre": "Romance",
+    "publishingYear": "1597",
+    "availability": 325
+  },
+  {
+    "title": "Slaughterhouse-Five",
+    "author": "Kurt Vonnegut",
+    "genre": "Sci-Fi",
+    "publishingYear": "1969",
+    "availability": 179
+  },
+  {
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "genre": "Drama",
+    "publishingYear": "1960",
+    "availability": 472
+  },
+  {
+    "title": "Ulysses",
+    "author": "James Joyce",
+    "genre": "Drama",
+    "publishingYear": "1922",
+    "availability": 294
+  },
+  {
+    "title": "Vanity Fair",
+    "author": "William Makepeace Thackeray",
+    "genre": "Drama",
+    "publishingYear": "1847-1848",
+    "availability": 132
+  },
+  {
+    "title": "Wuthering Heights",
+    "author": "Emily Brontë",
+    "genre": "Drama",
+    "publishingYear": "1847",
+    "availability": 243
+  },
+  {
+    "title": "Xenocide",
+    "author": "Orson Scott Card",
+    "genre": "Sci-Fi",
+    "publishingYear": "1991",
+    "availability": 85
+  },
+  {
+    "title": "You Only Live Twice",
+    "author": "Ian Fleming",
+    "genre": "Action",
+    "publishingYear": "1964",
+    "availability": 198
+  },
+  {
+    "title": "Zorba the Greek",
+    "author": "Nikos Kazantzakis",
+    "genre": "Drama",
+    "publishingYear": "1946",
+    "availability": 123
+  }
+
+
+     
+    ];
+
+    function renderBookItems(books) {
+      const bookTableBody = document.getElementById("book-table-body");
+      bookTableBody.innerHTML = "";
+
+      books.forEach((book) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${book.title}</td>
+          <td>${book.author}</td>
+          <td>${book.genre}</td>
+          <td>${book.publishingYear}</td>
+          <td>${book.availability}</td>
+          <td>
+            <button  class="btn btn-primary btn-sm add-to-cart" data-title="${book.title}" data-availability="${book.availability}" style="background-color:#4a3c2e">
+              Add to Cart
+            </button>
+          </td>
+        `;
+        bookTableBody.appendChild(row);
+      });
+    }
+
+    function updateBookCount(count) {
+      const bookCount = document.getElementById("book-count");
+      bookCount.textContent = `Total books: ${count}`;
+    }
+
+    function filterBooks() {
+      const searchInput = document.getElementById("search-input");
+      const userInput = searchInput.value.toLowerCase().trim();
+
+      const filteredBooks = books.filter((book) => {
+        return (
+          book.title.toLowerCase().includes(userInput) ||
+          book.author.toLowerCase().includes(userInput) ||
+          book.genre.toLowerCase().includes(userInput) ||
+          book.publishingYear.includes(userInput)
+        );
+      });
+
+      renderBookItems(filteredBooks);
+      updateBookCount(filteredBooks.length);
+    }
+
+    function filterByGenre(genre) {
+      const filteredBooks = books.filter((book) => {
+        return book.genre.toLowerCase() === genre.toLowerCase();
+      });
+
+      renderBookItems(filteredBooks);
+      updateBookCount(filteredBooks.length);
+    }
+
+    function goToCart() {
+      window.location.href = "cart.html";
+    }
+
+    document.getElementById("search-button").addEventListener("click", (e) => {
+      e.preventDefault();
+      filterBooks();
+    });
+
+    document.getElementById("search-input").addEventListener("input", filterBooks);
+
+    document.getElementById("filter-button").addEventListener("click", () => {
+      const genre = prompt("Enter the genre to filter by:");
+      if (genre) {
+        filterByGenre(genre);
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("add-to-cart")) {
+    const title = e.target.getAttribute("data-title");
+    const availability = parseInt(e.target.getAttribute("data-availability"));
+
+    if (availability === 0) {
+      alert(`"${title}" is currently not available.`);
+    } else {
+      const cartItem = {
+        title,
+        availability, 
+        copies: 1
+      };
+
+      let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const existingItem = cartItems.find((item) => item.title === title);
+
+      if (existingItem) {
+        existingItem.copies += 1;
+      } else {
+        cartItems.push(cartItem);
+      }
+
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      alert(`Book "${title}" added to cart.`);
+    }
+  }
+});
+
+
+
+    renderBookItems(books);
+    updateBookCount(books.length);
+  </script>
+</body>
+</html>

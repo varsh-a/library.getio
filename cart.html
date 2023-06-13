@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>e-Lib</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background-image: url(lib02.jpg);
+      background-size: cover;
+      padding: 10px;
+    }
+
+    .box {
+      background-color: white;
+      opacity: 0.85;
+      width: auto;
+      margin-left: 5%;
+      margin-right: 5%;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+  
+
+    table {
+      width: 100%;
+      
+    }
+
+    table td {
+      padding: 10px;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="container mt-5">
+        
+      <h1 class="mb-4" style="padding: 15px; text-align: center;"><b>CART</b></h1>
+      <a href="home.html" class="btn btn-primary float-left">Home</a>
+      <table class="cart-list">
+        <tbody>
+        </tbody>
+      </table>
+
+      <div class="mt-4" style="text-align: center;">
+        
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function renderCartItems(cartItems) {
+      const cartList = document.querySelector(".cart-list tbody");
+      cartList.innerHTML = "";
+
+      cartItems.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.className = "cart-item";
+        tr.setAttribute("data-title", item.title); 
+        tr.innerHTML = `
+          <td>${item.title}</td>
+         
+          <td>
+            <div class="input-group ml-2">
+              <input type="number" value="${item.copies}" min="1" max="${item.availability}" class="count-input">
+            </div>
+          </td>
+          <td>
+            <button class="btn btn-primary btn-sm rent-button" data-title="${item.title}" data-availability="${item.availability}">Rent</button>
+          </td>
+          <td>
+            <button class="btn btn-danger btn-sm remove-button" data-title="${item.title}">Remove</button>
+          </td>
+        `;
+        cartList.appendChild(tr);
+      });
+    }
+
+    function updateCartItemCounts() {
+      const countInputs = document.querySelectorAll(".count-input");
+      countInputs.forEach((input) => {
+        input.addEventListener("change", () => {
+          const title = input.parentNode.parentNode.parentNode.getAttribute("data-title");
+          const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+          const item = cartItems.find((item) => item.title === title);
+          if (item) {
+            item.copies = parseInt(input.value);
+            localStorage.setItem("cartItems", JSON.stringify(cartItems));
+          }
+        });
+      });
+    }
+
+    function removeCartItem() {
+      const removeButtons = document.querySelectorAll(".remove-button");
+      removeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const title = button.getAttribute("data-title");
+          const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+          const updatedCartItems = cartItems.filter((item) => item.title !== title);
+          localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+          renderCartItems(updatedCartItems);
+          updateCartItemCounts();
+          rentCartItem(); 
+        });
+      });
+    }
+
+    function rentCartItem() {
+      const rentButtons = document.querySelectorAll(".rent-button");
+      rentButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const title = button.getAttribute("data-title");
+          const availability = parseInt(button.getAttribute("data-availability"));
+          const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+          const item = cartItems.find((item) => item.title === title);
+          if (item) {
+            const input = button.parentNode.previousElementSibling.querySelector(".count-input");
+            const copies = parseInt(input.value);
+            if (copies > 0 && copies <= availability) {
+              alert(`You can rent "${title}".`);
+            } else {
+              alert(`Insufficient copies for "${title}".`);
+            }
+          }
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      renderCartItems(cartItems);
+      updateCartItemCounts();
+      removeCartItem();
+      rentCartItem();
+    });
+  </script>
+</body>
+</html>
